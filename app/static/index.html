@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>仓核 · Registry WebFS</title>
+  <link rel="stylesheet" href="/static/style.css?v=2" />
+</head>
+<body>
+  <div class="bg-grid"></div>
+  <div class="bg-glow"></div>
+  <aside class="rail">
+    <div class="brand">
+      <div class="logo">仓</div>
+      <div>
+        <div class="brand-name">仓核 WebFS</div>
+        <div class="brand-sub">Docker Registry Blob</div>
+      </div>
+    </div>
+    <nav class="nav">
+      <button class="nav-item active" data-view="files">文件舱</button>
+      <button class="nav-item" data-view="blobs">Blob 仓</button>
+      <button class="nav-item" data-view="registry">Registry API</button>
+    </nav>
+    <div class="rail-stats" id="rail-stats">
+      <div class="stat"><span>文件</span><b id="st-files">-</b></div>
+      <div class="stat"><span>目录</span><b id="st-dirs">-</b></div>
+      <div class="stat"><span>逻辑容量</span><b id="st-logical">-</b></div>
+      <div class="stat"><span>Blob 数</span><b id="st-blobs">-</b></div>
+      <div class="stat"><span>物理占用</span><b id="st-phys">-</b></div>
+    </div>
+    <div class="rail-foot">OCI Distribution v2 · sha256</div>
+  </aside>
+  <main class="stage">
+    <header class="top">
+      <div class="crumbs" id="crumbs"></div>
+      <div class="top-actions">
+        <div class="search-wrap">
+          <input id="search" type="search" placeholder="检索路径或文件名" autocomplete="off" />
+        </div>
+        <button class="btn ghost" id="btn-mkdir" type="button">新建目录</button>
+        <label class="btn solid" for="file-input">上传文件</label>
+        <input id="file-input" type="file" multiple hidden />
+      </div>
+    </header>
+    <section class="dropzone" id="dropzone">
+      <div class="drop-hint">将文件拖入此处，以 Blob 写入 Registry</div>
+    </section>
+    <section class="panel" id="panel-files">
+      <div class="table-head">
+        <span class="col-name">名称</span>
+        <span class="col-type">类型</span>
+        <span class="col-size">大小</span>
+        <span class="col-digest">Digest</span>
+        <span class="col-time">更新时间</span>
+        <span class="col-act">操作</span>
+      </div>
+      <div class="table-body" id="list"></div>
+    </section>
+    <section class="panel hidden" id="panel-blobs">
+      <div class="blob-intro">当前仓库 <code>webfs/vault</code> 中的内容寻址对象。每个文件对应一层 OCI layer blob。</div>
+      <pre id="blob-dump" class="codeblock"></pre>
+    </section>
+    <section class="panel hidden" id="panel-registry">
+      <div class="api-grid">
+        <article>
+          <h3>兼容端点</h3>
+          <ul>
+            <li><code>GET /v2/</code> 探活</li>
+            <li><code>GET /v2/_catalog</code> 仓库目录</li>
+            <li><code>GET /v2/{name}/tags/list</code></li>
+            <li><code>POST /v2/{name}/blobs/uploads/</code></li>
+            <li><code>PUT /v2/{name}/manifests/{ref}</code></li>
+          </ul>
+        </article>
+        <article>
+          <h3>WebFS 约定</h3>
+          <p>文件以独立 blob 存储，digest 为 sha256。目录结构写入 tagged manifest <code>webfs/vault:index</code>。每个文件另打 <code>file-&lt;hash&gt;</code> tag，layer 即文件内容。</p>
+        </article>
+      </div>
+      <pre id="catalog-dump" class="codeblock"></pre>
+    </section>
+  </main>
+  <div class="toast-wrap" id="toasts"></div>
+  <dialog id="dlg">
+    <form id="dlg-form">
+      <h3 id="dlg-title">新建目录</h3>
+      <input id="dlg-input" type="text" required maxlength="180" autocomplete="off" />
+      <div class="dlg-actions">
+        <button type="button" id="dlg-cancel" class="btn ghost">取消</button>
+        <button type="submit" class="btn solid">确定</button>
+      </div>
+    </form>
+  </dialog>
+  <dialog id="preview">
+    <div class="preview-head">
+      <strong id="pv-name"></strong>
+      <button class="btn ghost" id="pv-close">关闭</button>
+    </div>
+    <div id="pv-body"></div>
+  </dialog>
+  <script src="/static/app.js?v=2"></script>
+</body>
+</html>
